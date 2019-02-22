@@ -2,7 +2,6 @@
 
 const FILTERS_NAME = [`all`, `overdue`, `today`, `favorites`, `repeating`, `tags`, `archive`];
 const RANDOM_MAX = 10;
-const FILTER_LENGTH = 7;
 
 const makeFilter = (name, count, isChecked = false) => {
   return `<input
@@ -314,9 +313,9 @@ const makeTask = (number) => {
 
 const makeFilterCount = (count) => {
   let filterArray = [0];
-  for (let i = 1; i < FILTER_LENGTH; i++) {
+  for (let i = 1; i < FILTERS_NAME.length; i++) {
     filterArray[i] = Math.floor(Math.random() * count);
-    if (i < FILTER_LENGTH - 1) {
+    if (i < FILTERS_NAME.length - 1) {
       filterArray[0] += filterArray[i];
     }
   }
@@ -343,7 +342,7 @@ const makeBoard = (count) => {
 };
 
 FILTERS_NAME.forEach((elem, index) => {
-  mainFilter.insertAdjacentHTML(`beforeEnd`, makeFilter(elem, filters[index], elem === `all` ? true : false));
+  mainFilter.insertAdjacentHTML(`beforeEnd`, makeFilter(elem, filters[index], elem === `all`));
 });
 
 mainFilter.querySelectorAll(`.filter__input`).forEach((elem, index) => {
