@@ -1,3 +1,4 @@
+import data from './data.js';
 import {mainFilter, filters} from './make-filter.js';
 import makeTask from './make-task.js';
 
@@ -13,7 +14,7 @@ const makeBoard = (count) => {
   removeTasks();
   let template = ``;
   for (let i = 1; i <= count; i++) {
-    template += makeTask(i);
+    template += makeTask(data(), i);
   }
 
   boardTasks.insertAdjacentHTML(`beforeEnd`, template);
