@@ -17,18 +17,14 @@ const getRandomElement = (arr) => arr[getRandom(arr.length)];
 
 const getRandomDate = () => Date.now() + (Math.random() < 0.5 ? 1 : -1) * getRandom(7) * 24 * 60 * 60 * 1000;
 
-const getTags = (arr) => {
-  let newArray = [...arr];
+const getTags = (tag) => {
+  let setOfTags = new Set();
 
-  newArray.forEach((elem, index) => {
-    const newIndex = getRandom(index + 1);
-    const element = elem;
+  for (let index = 0; index < 3; index++) {
+    setOfTags.add([...tag][getRandom(tag.size)]);
+  }
 
-    newArray[index] = newArray[newIndex];
-    newArray[newIndex] = element;
-  });
-
-  return newArray.slice(0, getRandom(newArray.length));
+  return setOfTags;
 };
 
 const createDays = (week) => {

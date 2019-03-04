@@ -1,12 +1,29 @@
-// import data from './data.js';
+const months = [`January`, `February`, `March`, `April`, `May`, `June`, `July`, `August`, `September`, `October`, `November`, `December`];
+
 const makeTags = (tags) => {
-  return tags.map((tag) => `
-    <span class="card__hashtag-inner">
+  let templateOfTags = ``;
+
+  for (let tag of tags) {
+    templateOfTags += `<span class="card__hashtag-inner">
       <input type="hidden" name="hashtag" value="repeat" class="card__hashtag-hidden-input"/>
       <button type="button" class="card__hashtag-name">#${tag}</button>
       <button type="button" class="card__hashtag-delete">delete</button>
-    </span>
-    `).join(``);
+    </span>`;
+  }
+
+  return templateOfTags;
+};
+
+const getDate = (timestamp) => {
+  const humanFormat = new Date(timestamp);
+
+  return humanFormat.getDate() + ` ` + months[humanFormat.getMonth()];
+};
+
+const getTime = (timestamp) => {
+  const humanFormat = new Date(timestamp);
+
+  return humanFormat.getHours() + `:` + humanFormat.getMinutes();
 };
 
 export default (data, number) => `<article class="card card--${data.color} card--repeat">
@@ -45,12 +62,12 @@ export default (data, number) => `<article class="card card--${data.color} card-
                         date: <span class="card__date-status">no</span>
                       </button>
 
-                      <fieldset class="card__date-deadline" disabled>
+                      <fieldset class="card__date-deadline" ${data.dueDate ? `` : `disabled`}>
                         <label class="card__input-deadline-wrap">
                           <input
                             class="card__date"
                             type="text"
-                            placeholder="23 September"
+                            placeholder="${getDate(data.dueDate)}"
                             name="date"
                           />
                         </label>
@@ -58,7 +75,7 @@ export default (data, number) => `<article class="card card--${data.color} card-
                           <input
                             class="card__time"
                             type="text"
-                            placeholder="11:15 PM"
+                            placeholder="${getTime(data.dueDate)}"
                             name="time"
                           />
                         </label>
@@ -148,12 +165,8 @@ export default (data, number) => `<article class="card card--${data.color} card-
                     </div>
                   </div>
 
-                  <label class="card__img-wrap card__img-wrap--empty">
-                    <input
-                      type="file"
-                      class="card__img-input visually-hidden"
-                      name="img"
-                    />
+                  <label class="card__img-wrap ${data.picture ? `` : `card__img-wrap--empty`}">
+                    <input type="file" class="card__img-input visually-hidden" name="img"/>
                     <img
                       src="${data.picture}"
                       alt="task picture"

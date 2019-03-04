@@ -13,8 +13,15 @@ const removeTasks = () => {
 const makeBoard = (count) => {
   removeTasks();
   let template = ``;
-  for (let i = 1; i <= count; i++) {
-    template += makeTask(data(), i);
+  let arrayOfTasks = [];
+
+  for (let i = 0; i < count; i++) {
+    arrayOfTasks[i] = data();
+  }
+
+  let index = 1;
+  for (let item of arrayOfTasks) {
+    template += makeTask(item, index++);
   }
 
   boardTasks.insertAdjacentHTML(`beforeEnd`, template);
