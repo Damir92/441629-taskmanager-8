@@ -15,7 +15,7 @@ const getRandom = (length) => Math.floor(Math.random() * length);
 
 const getRandomElement = (arr) => arr[getRandom(arr.length)];
 
-const getRandomDate = () => Date.now() + (Math.random() < 0.5 ? 1 : -1) * getRandom(7) * 24 * 60 * 60 * 1000;
+const getRandomDate = () => Date.now() + (Math.random() < 0.5 ? 1 : -1) * getRandom(7 * 24 * 60 * 60 * 1000);
 
 const getTags = (tag) => {
   let setOfTags = new Set();
@@ -42,7 +42,7 @@ const createDays = (week) => {
 export default () => ({
   title: getRandomElement(titles),
 
-  dueDate: getRandomDate(),
+  dueDate: new Date(getRandomDate()),
 
   tags: getTags(tags),
 

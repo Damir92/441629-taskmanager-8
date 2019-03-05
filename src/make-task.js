@@ -14,19 +14,22 @@ const makeTags = (tags) => {
   return templateOfTags;
 };
 
-const getDate = (timestamp) => {
-  const humanFormat = new Date(timestamp);
-
-  return humanFormat.getDate() + ` ` + months[humanFormat.getMonth()];
+const makeDate = (date) => {
+  const dayOfMonth = date.getDate() < 10 ? `0` + date.getDate() : date.getDate();
+  return dayOfMonth + ` ` + months[date.getMonth()];
 };
 
-const getTime = (timestamp) => {
-  const humanFormat = new Date(timestamp);
-
-  return humanFormat.getHours() + `:` + humanFormat.getMinutes();
+const makeTime = (date) => {
+  const hours = date.getHours() < 10 ? `0` + date.getHours() : date.getHours();
+  const minutes = date.getMinutes() < 10 ? `0` + date.getMinutes() : date.getMinutes();
+  return hours + `:` + minutes;
 };
 
-export default (data, number) => `<article class="card card--${data.color} card--repeat">
+const testDeadline = (date) => {
+  return Date.now() < Date.parse(date);
+};
+
+export default (data, number) => `<article class="card card--${data.color} card--repeat ${testDeadline(data.dueDate) ? `` : `card--deadline`}">
             <form class="card__form" method="get">
               <div class="card__inner">
                 <div class="card__control">
@@ -67,7 +70,7 @@ export default (data, number) => `<article class="card card--${data.color} card-
                           <input
                             class="card__date"
                             type="text"
-                            placeholder="${getDate(data.dueDate)}"
+                            placeholder="${makeDate(data.dueDate)}"
                             name="date"
                           />
                         </label>
@@ -75,7 +78,7 @@ export default (data, number) => `<article class="card card--${data.color} card-
                           <input
                             class="card__time"
                             type="text"
-                            placeholder="${getTime(data.dueDate)}"
+                            placeholder="${makeTime(data.dueDate)}"
                             name="time"
                           />
                         </label>

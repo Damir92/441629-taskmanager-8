@@ -1,4 +1,4 @@
-import data from './data.js';
+import getRandomTask from './data.js';
 import {mainFilter, filters} from './make-filter.js';
 import makeTask from './make-task.js';
 
@@ -16,7 +16,7 @@ const makeBoard = (count) => {
   let arrayOfTasks = [];
 
   for (let i = 0; i < count; i++) {
-    arrayOfTasks[i] = data();
+    arrayOfTasks[i] = getRandomTask();
   }
 
   let index = 1;
