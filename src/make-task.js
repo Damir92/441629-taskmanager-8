@@ -1,4 +1,35 @@
-export default (number) => `<article class="card card--pink card--repeat">
+const months = [`January`, `February`, `March`, `April`, `May`, `June`, `July`, `August`, `September`, `October`, `November`, `December`];
+
+const makeTags = (tags) => {
+  let templateOfTags = ``;
+
+  for (let tag of tags) {
+    templateOfTags += `<span class="card__hashtag-inner">
+      <input type="hidden" name="hashtag" value="repeat" class="card__hashtag-hidden-input"/>
+      <button type="button" class="card__hashtag-name">#${tag}</button>
+      <button type="button" class="card__hashtag-delete">delete</button>
+    </span>`;
+  }
+
+  return templateOfTags;
+};
+
+const makeDate = (date) => {
+  const dayOfMonth = date.getDate() < 10 ? `0` + date.getDate() : date.getDate();
+  return dayOfMonth + ` ` + months[date.getMonth()];
+};
+
+const makeTime = (date) => {
+  const hours = date.getHours() < 10 ? `0` + date.getHours() : date.getHours();
+  const minutes = date.getMinutes() < 10 ? `0` + date.getMinutes() : date.getMinutes();
+  return hours + `:` + minutes;
+};
+
+const testDeadline = (date) => {
+  return Date.now() < Date.parse(date);
+};
+
+export default (data, number) => `<article class="card card--${data.color} card--repeat ${testDeadline(data.dueDate) ? `` : `card--deadline`}">
             <form class="card__form" method="get">
               <div class="card__inner">
                 <div class="card__control">
@@ -8,9 +39,8 @@ export default (number) => `<article class="card card--pink card--repeat">
                   <button type="button" class="card__btn card__btn--archive">
                     archive
                   </button>
-                  <button
-                    type="button"
-                    class="card__btn card__btn--favorites card__btn--disabled"
+                  <button type="button" class="card__btn card__btn--favorites
+                  card__btn--${data.isFavorite ? `` : `disabled`}"
                   >
                     favorites
                   </button>
@@ -24,12 +54,7 @@ export default (number) => `<article class="card card--pink card--repeat">
 
                 <div class="card__textarea-wrap">
                   <label>
-                    <textarea
-                      class="card__text"
-                      placeholder="Start typing your text here..."
-                      name="text"
-                    >It is example of repeating task. It marks by wave.</textarea
-                    >
+                    <textarea class="card__text" placeholder="Start typing your text here..." name="text">${data.title}</textarea>
                   </label>
                 </div>
 
@@ -40,12 +65,12 @@ export default (number) => `<article class="card card--pink card--repeat">
                         date: <span class="card__date-status">no</span>
                       </button>
 
-                      <fieldset class="card__date-deadline" disabled>
+                      <fieldset class="card__date-deadline" ${data.dueDate ? `` : `disabled`}>
                         <label class="card__input-deadline-wrap">
                           <input
                             class="card__date"
                             type="text"
-                            placeholder="23 September"
+                            placeholder="${makeDate(data.dueDate)}"
                             name="date"
                           />
                         </label>
@@ -53,7 +78,7 @@ export default (number) => `<article class="card card--pink card--repeat">
                           <input
                             class="card__time"
                             type="text"
-                            placeholder="11:15 PM"
+                            placeholder="${makeTime(data.dueDate)}"
                             name="time"
                           />
                         </label>
@@ -71,144 +96,82 @@ export default (number) => `<article class="card card--pink card--repeat">
                             id="repeat-mo-${number}"
                             name="repeat"
                             value="mo"
+                            ${data.repeatingDays.mo ? `checked` : ``}
                           />
-                          <label class="card__repeat-day" for="repeat-mo-${number}"
-                            >mo</label
-                          >
+                          <label class="card__repeat-day" for="repeat-mo-${number}">mo</label>
                           <input
                             class="visually-hidden card__repeat-day-input"
                             type="checkbox"
                             id="repeat-tu-${number}"
                             name="repeat"
                             value="tu"
-                            checked
+                            ${data.repeatingDays.tu ? `checked` : ``}
                           />
-                          <label class="card__repeat-day" for="repeat-tu-${number}"
-                            >tu</label
-                          >
+                          <label class="card__repeat-day" for="repeat-tu-${number}">tu</label>
                           <input
                             class="visually-hidden card__repeat-day-input"
                             type="checkbox"
                             id="repeat-we-${number}"
                             name="repeat"
                             value="we"
+                            ${data.repeatingDays.we ? `checked` : ``}
                           />
-                          <label class="card__repeat-day" for="repeat-we-${number}"
-                            >we</label
-                          >
+                          <label class="card__repeat-day" for="repeat-we-${number}">we</label>
                           <input
                             class="visually-hidden card__repeat-day-input"
                             type="checkbox"
                             id="repeat-th-${number}"
                             name="repeat"
                             value="th"
+                            ${data.repeatingDays.th ? `checked` : ``}
                           />
-                          <label class="card__repeat-day" for="repeat-th-${number}"
-                            >th</label
-                          >
+                          <label class="card__repeat-day" for="repeat-th-${number}">th</label>
                           <input
                             class="visually-hidden card__repeat-day-input"
                             type="checkbox"
                             id="repeat-fr-${number}"
                             name="repeat"
                             value="fr"
-                            checked
+                            ${data.repeatingDays.fr ? `checked` : ``}
                           />
-                          <label class="card__repeat-day" for="repeat-fr-${number}"
-                            >fr</label
-                          >
+                          <label class="card__repeat-day" for="repeat-fr-${number}">fr</label>
                           <input
                             class="visually-hidden card__repeat-day-input"
                             type="checkbox"
+                            id="repeat-sa-${number}"
                             name="repeat"
                             value="sa"
-                            id="repeat-sa-${number}"
+                            ${data.repeatingDays.sa ? `checked` : ``}
                           />
-                          <label class="card__repeat-day" for="repeat-sa-${number}"
-                            >sa</label
-                          >
+                          <label class="card__repeat-day" for="repeat-sa-${number}">sa</label>
                           <input
                             class="visually-hidden card__repeat-day-input"
                             type="checkbox"
                             id="repeat-su-${number}"
                             name="repeat"
                             value="su"
-                            checked
+                            ${data.repeatingDays.su ? `checked` : ``}
                           />
-                          <label class="card__repeat-day" for="repeat-su-${number}"
-                            >su</label
-                          >
+                          <label class="card__repeat-day" for="repeat-su-${number}">su</label>
                         </div>
                       </fieldset>
                     </div>
 
                     <div class="card__hashtag">
                       <div class="card__hashtag-list">
-                        <span class="card__hashtag-inner">
-                          <input
-                            type="hidden"
-                            name="hashtag"
-                            value="repeat"
-                            class="card__hashtag-hidden-input"
-                          />
-                          <button type="button" class="card__hashtag-name">
-                            #repeat
-                          </button>
-                          <button type="button" class="card__hashtag-delete">
-                            delete
-                          </button>
-                        </span>
-
-                        <span class="card__hashtag-inner">
-                          <input
-                            type="hidden"
-                            name="hashtag"
-                            value="repeat"
-                            class="card__hashtag-hidden-input"
-                          />
-                          <button type="button" class="card__hashtag-name">
-                            #cinema
-                          </button>
-                          <button type="button" class="card__hashtag-delete">
-                            delete
-                          </button>
-                        </span>
-
-                        <span class="card__hashtag-inner">
-                          <input
-                            type="hidden"
-                            name="hashtag"
-                            value="repeat"
-                            class="card__hashtag-hidden-input"
-                          />
-                          <button type="button" class="card__hashtag-name">
-                            #entertaiment
-                          </button>
-                          <button type="button" class="card__hashtag-delete">
-                            delete
-                          </button>
-                        </span>
+                        ${makeTags(data.tags)}
                       </div>
 
                       <label>
-                        <input
-                          type="text"
-                          class="card__hashtag-input"
-                          name="hashtag-input"
-                          placeholder="Type new hashtag here"
-                        />
+                        <input type="text" class="card__hashtag-input" name="hashtag-input" placeholder="Type new hashtag here"/>
                       </label>
                     </div>
                   </div>
 
-                  <label class="card__img-wrap card__img-wrap--empty">
-                    <input
-                      type="file"
-                      class="card__img-input visually-hidden"
-                      name="img"
-                    />
+                  <label class="card__img-wrap ${data.picture ? `` : `card__img-wrap--empty`}">
+                    <input type="file" class="card__img-input visually-hidden" name="img"/>
                     <img
-                      src="img/add-photo.svg"
+                      src="${data.picture}"
                       alt="task picture"
                       class="card__img"
                     />

@@ -1,3 +1,4 @@
+import getRandomTask from './data.js';
 import {mainFilter, filters} from './make-filter.js';
 import makeTask from './make-task.js';
 
@@ -12,8 +13,15 @@ const removeTasks = () => {
 const makeBoard = (count) => {
   removeTasks();
   let template = ``;
-  for (let i = 1; i <= count; i++) {
-    template += makeTask(i);
+  let arrayOfTasks = [];
+
+  for (let i = 0; i < count; i++) {
+    arrayOfTasks[i] = getRandomTask();
+  }
+
+  let index = 1;
+  for (let item of arrayOfTasks) {
+    template += makeTask(item, index++);
   }
 
   boardTasks.insertAdjacentHTML(`beforeEnd`, template);
