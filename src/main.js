@@ -19,7 +19,6 @@ const makeBoard = (count) => {
     arrayOfTasks[i] = getRandomTask();
   }
 
-  // let index = 1;
   for (let item of arrayOfTasks) {
     const taskComponent = new Task(item);
     const editTaskComponent = new TaskEdit(item);

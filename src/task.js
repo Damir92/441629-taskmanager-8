@@ -12,6 +12,7 @@ export default class Task {
 
     this._element = null;
     this._onEdit = null;
+    this._eventListener = ``;
   }
 
   _isRepeated() {
@@ -107,7 +108,7 @@ export default class Task {
   }
 
   bind() {
-    this._element.querySelector(`.card__btn--edit`)
+    this._eventListener = this._element.querySelector(`.card__btn--edit`)
         .addEventListener(`click`, this._onEditButtonClick.bind(this));
   }
 
@@ -123,7 +124,6 @@ export default class Task {
   }
 
   unbind() {
-    this._element.querySelector(`.card__btn--edit`)
-        .removeEventListener(`click`, this._onEditButtonClick.bind(this));
+    this._eventListener = null;
   }
 }
