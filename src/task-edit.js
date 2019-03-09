@@ -12,7 +12,6 @@ export default class TaskEdit {
 
     this._element = null;
     this._onEdit = null;
-    this._eventListener = ``;
   }
 
   _isRepeated() {
@@ -21,11 +20,6 @@ export default class TaskEdit {
 
   _isDeadline() {
     return Date.now() < Date.parse(this._dueDate);
-  }
-
-  _onSubmitButtonClick(evt) {
-    evt.preventDefault();
-    return typeof this._onSubmit === `function` && this._onSubmit();
   }
 
   set onSubmit(fn) {
@@ -167,8 +161,13 @@ export default class TaskEdit {
   }
 
   bind() {
-    this._eventListener = this._element.querySelector(`.card__form`)
-        .addEventListener(`submit`, this._onSubmitButtonClick.bind(this));
+    this._onSubmitButtonClick = (evt) => {
+      evt.preventDefault();
+      return typeof this._onSubmit === `function` && this._onSubmit();
+    };
+
+    this._element.querySelector(`.card__form`)
+        .addEventListener(`submit`, this._onSubmitButtonClick);
   }
 
   render() {
@@ -183,6 +182,7 @@ export default class TaskEdit {
   }
 
   unbind() {
-    this._eventListener = null;
+    this._element.querySelector(`.card__form`)
+        .removeEventListener(`submit`, this._onSubmitButtonClick);
   }
 }

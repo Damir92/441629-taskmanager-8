@@ -12,7 +12,6 @@ export default class Task {
 
     this._element = null;
     this._onEdit = null;
-    this._eventListener = ``;
   }
 
   _isRepeated() {
@@ -21,10 +20,6 @@ export default class Task {
 
   _isDeadline() {
     return Date.now() < Date.parse(this._dueDate);
-  }
-
-  _onEditButtonClick() {
-    return typeof this._onEdit === `function` && this._onEdit();
   }
 
   get element() {
@@ -108,8 +103,12 @@ export default class Task {
   }
 
   bind() {
-    this._eventListener = this._element.querySelector(`.card__btn--edit`)
-        .addEventListener(`click`, this._onEditButtonClick.bind(this));
+    this._onEditButtonClick = () => {
+      return typeof this._onEdit === `function` && this._onEdit();
+    };
+
+    this._element.querySelector(`.card__btn--edit`)
+        .addEventListener(`click`, this._onEditButtonClick);
   }
 
   render() {
@@ -124,6 +123,7 @@ export default class Task {
   }
 
   unbind() {
-    this._eventListener = null;
+    this._element.querySelector(`.card__btn--edit`)
+        .removeEventListener(`click`, this._onEditButtonClick);
   }
 }
