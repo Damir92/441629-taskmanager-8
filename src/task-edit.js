@@ -1,7 +1,9 @@
-import {createElement, makeDate, makeTime} from './utils.js';
+import Component from './component.js';
+import {makeDate, makeTime} from './utils.js';
 
-export default class TaskEdit {
+export default class TaskEdit extends Component {
   constructor(data) {
+    super();
     this._title = data.title;
     this._tags = data.tags;
     this._picture = data.picture;
@@ -10,8 +12,7 @@ export default class TaskEdit {
     this._color = data.color;
     this._isFavourite = data.isFavorite;
 
-    this._element = null;
-    this._onEdit = null;
+    this._onSubmit = null;
   }
 
   _isRepeated() {
@@ -24,10 +25,6 @@ export default class TaskEdit {
 
   set onSubmit(fn) {
     this._onSubmit = fn;
-  }
-
-  get element() {
-    return this._element;
   }
 
   get template() {
@@ -168,17 +165,6 @@ export default class TaskEdit {
 
     this._element.querySelector(`.card__form`)
         .addEventListener(`submit`, this._onSubmitButtonClick);
-  }
-
-  render() {
-    this._element = createElement(this.template);
-    this.bind();
-    return this._element;
-  }
-
-  unrender() {
-    this.unbind();
-    this._element = null;
   }
 
   unbind() {
