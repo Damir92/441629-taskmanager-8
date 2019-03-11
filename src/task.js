@@ -1,7 +1,9 @@
-import {createElement, makeDate, makeTime} from './utils.js';
+import Component from './component.js';
+import {makeDate, makeTime} from './utils.js';
 
-export default class Task {
+export default class Task extends Component {
   constructor(data) {
+    super();
     this._title = data.title;
     this._tags = data.tags;
     this._picture = data.picture;
@@ -10,7 +12,6 @@ export default class Task {
     this._color = data.color;
     this._isFavourite = data.isFavourite;
 
-    this._element = null;
     this._onEdit = null;
   }
 
@@ -20,10 +21,6 @@ export default class Task {
 
   _isDeadline() {
     return Date.now() < Date.parse(this._dueDate);
-  }
-
-  get element() {
-    return this._element;
   }
 
   set onEdit(fn) {
@@ -109,17 +106,6 @@ export default class Task {
 
     this._element.querySelector(`.card__btn--edit`)
         .addEventListener(`click`, this._onEditButtonClick);
-  }
-
-  render() {
-    this._element = createElement(this.template);
-    this.bind();
-    return this._element;
-  }
-
-  unrender() {
-    this.unbind();
-    this._element = null;
   }
 
   unbind() {
