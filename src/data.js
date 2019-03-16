@@ -2,13 +2,13 @@ const titles = [`Изучить теорию`, `Сделать домашку`, 
 const tags = new Set([`homework`, `theory`, `practice`, `intensive`, `keks`]);
 const colors = [`black`, `yellow`, `blue`, `green`, `pink`];
 const days = {
-  mo: true,
+  mo: false,
   tu: false,
-  we: true,
+  we: false,
   th: false,
-  fr: true,
+  fr: false,
   sa: false,
-  su: true
+  su: false
 };
 
 const getRandom = (length) => Math.floor(Math.random() * length);
@@ -39,7 +39,7 @@ const createDays = (week) => {
   return newDays;
 };
 
-export default () => ({
+export default (index) => ({
   title: getRandomElement(titles),
 
   dueDate: new Date(getRandomDate()),
@@ -54,5 +54,7 @@ export default () => ({
 
   isFavorite: !!getRandom(2),
 
-  isDone: !!getRandom(2)
+  isDone: !!getRandom(2),
+
+  index
 });

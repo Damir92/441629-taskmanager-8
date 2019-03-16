@@ -3,7 +3,7 @@ import {createElement} from './utils.js';
 export default class Component {
   constructor() {
     if (new.target === Component) {
-      throw new Error(`Can't instantiate BaseComponent, on;y concrete one.`);
+      throw new Error(`Can't instantiate BaseComponent, only concrete one.`);
     }
 
     this._element = null;
@@ -33,4 +33,6 @@ export default class Component {
     this._element.remove();
     this._element = null;
   }
+
+  update() {}
 }

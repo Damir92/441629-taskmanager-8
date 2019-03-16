@@ -16,7 +16,7 @@ const makeBoard = (count) => {
   let arrayOfTasks = [];
 
   for (let i = 0; i < count; i++) {
-    arrayOfTasks[i] = getRandomTask();
+    arrayOfTasks[i] = getRandomTask(i);
   }
 
   for (let item of arrayOfTasks) {
@@ -31,7 +31,14 @@ const makeBoard = (count) => {
       taskComponent.unrender();
     };
 
-    editTaskComponent.onSubmit = () => {
+    editTaskComponent.onSubmit = (newObject) => {
+      item.title = newObject.title;
+      item.tags = newObject.tags;
+      item.color = newObject.color;
+      item.repeatingDays = newObject.repeatingDays;
+      item.dueDate = newObject.dueDate;
+
+      taskComponent.update(item);
       taskComponent.render();
       boardTasks.replaceChild(taskComponent.element, editTaskComponent.element);
       editTaskComponent.unrender();
