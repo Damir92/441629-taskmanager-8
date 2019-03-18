@@ -255,8 +255,12 @@ export default class TaskEdit extends Component {
         .removeEventListener(`click`, this._onChangeDate);
     this._element.querySelector(`.card__repeat-toggle`)
         .removeEventListener(`click`, this._onChangeRepeated);
-    this._flatpickrDate.destroy();
-    this._flatpickrTime.destroy();
+    if (this._flatpickrDate) {
+      this._flatpickrDate.destroy();
+    }
+    if (this._flatpickrTime) {
+      this._flatpickrTime.destroy();
+    }
   }
 
   update(data) {
