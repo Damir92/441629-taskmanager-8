@@ -1,6 +1,6 @@
 import Component from './component.js';
-import {makeDate, makeTime} from './utils.js';
 import flatpickr from 'flatpickr';
+import moment from 'moment';
 
 export default class TaskEdit extends Component {
   constructor(data) {
@@ -22,6 +22,9 @@ export default class TaskEdit extends Component {
 
     this._onChangeDate = this._onChangeDate.bind(this);
     this._onChangeRepeated = this._onChangeRepeated.bind(this);
+
+    this._flatpickrDate = null;
+    this._flatpickrTime = null;
   }
 
   _processForm(formData) {
@@ -45,9 +48,15 @@ export default class TaskEdit extends Component {
 
     for (const pair of formData.entries()) {
       const [property, value] = pair;
+
       if (taskEditMapper[property]) {
-        taskEditMapper[property](value);
+        if (property === `date` && value === ``) {
+          taskEditMapper[property](this._dueDate);
+        } else {
+          taskEditMapper[property](value);
+        }
       }
+
     }
 
     return entry;
@@ -131,11 +140,11 @@ export default class TaskEdit extends Component {
 
                 <fieldset class="card__date-deadline" ${!this._state.isDate && `disabled`}>
                   <label class="card__input-deadline-wrap">
-                    <input class="card__date" type="text" placeholder="${makeDate(this._dueDate)}" name="date" />
+                    <input class="card__date" type="text" placeholder="${moment(this._dueDate).format(`D MMMM`)}" name="date" />
                   </label>
 
                   <label class="card__input-deadline-wrap">
-                    <input class="card__time" type="text" placeholder="${makeTime(this._dueDate)}" name="time" />
+                    <input class="card__time" type="text" placeholder="${moment(this._dueDate).format(`h:mm a`)}" name="time" />
                   </label>
                 </fieldset>
 
@@ -234,8 +243,8 @@ export default class TaskEdit extends Component {
         .addEventListener(`click`, this._onChangeRepeated);
 
     if (this._state.isDate) {
-      flatpickr(`.card__date`, {altInput: true, altFormat: `j F`, dateFormat: `j F`});
-      flatpickr(`.card__time`, {enableTime: true, noCalendar: true, altInput: true, altFormat: `h:i K`, dateFormat: `h:i K`});
+      this._flatpickrDate = flatpickr(this._element.querySelector(`.card__date`), {altInput: true, altFormat: `j F`});
+      this._flatpickrTime = flatpickr(this._element.querySelector(`.card__time`), {enableTime: true, noCalendar: true, altInput: true, altFormat: `h:i K`, dateFormat: `h:i K`});
     }
   }
 
@@ -246,6 +255,8 @@ export default class TaskEdit extends Component {
         .removeEventListener(`click`, this._onChangeDate);
     this._element.querySelector(`.card__repeat-toggle`)
         .removeEventListener(`click`, this._onChangeRepeated);
+    this._flatpickrDate.destroy();
+    this._flatpickrTime.destroy();
   }
 
   update(data) {
@@ -268,7 +279,9 @@ export default class TaskEdit extends Component {
       repeat: (value) => {
         target.repeatingDays[value] = true;
       },
-      date: (value) => target.dueDate[value]
+      date: (value) => {
+        target.dueDate = new Date(value);
+      }
     };
   }
 }

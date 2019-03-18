@@ -1,5 +1,6 @@
 const path = require(`path`);
 const flatpickr = require(`flatpickr`);
+const moment = require(`moment`);
 
 module.exports = {
   mode: `development`,
