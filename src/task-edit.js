@@ -1,5 +1,6 @@
 import Component from './component.js';
-import {makeDate, makeTime} from './utils.js';
+import flatpickr from 'flatpickr';
+import moment from 'moment';
 
 export default class TaskEdit extends Component {
   constructor(data) {
@@ -11,8 +12,80 @@ export default class TaskEdit extends Component {
     this._repeatingDays = data.repeatingDays;
     this._color = data.color;
     this._isFavourite = data.isFavorite;
+    this._id = data.index;
 
+    this._onSubmitButtonClick = this._onSubmitButtonClick.bind(this);
     this._onSubmit = null;
+
+    this._state.isDate = this._dueDate;
+    this._state.isRepeated = Object.values(this._repeatingDays).some((it) => it === true);
+
+    this._onChangeDate = this._onChangeDate.bind(this);
+    this._onChangeRepeated = this._onChangeRepeated.bind(this);
+
+    this._flatpickrDate = null;
+    this._flatpickrTime = null;
+  }
+
+  _processForm(formData) {
+    const entry = {
+      title: ``,
+      color: ``,
+      tags: new Set(),
+      dueDate: new Date(),
+      repeatingDays: {
+        'mo': false,
+        'tu': false,
+        'we': false,
+        'th': false,
+        'fr': false,
+        'sa': false,
+        'su': false,
+      }
+    };
+
+    const taskEditMapper = TaskEdit.createMapper(entry);
+
+    for (const pair of formData.entries()) {
+      const [property, value] = pair;
+
+      if (taskEditMapper[property]) {
+        if (property === `date` && value === ``) {
+          taskEditMapper[property](this._dueDate);
+        } else {
+          taskEditMapper[property](value);
+        }
+      }
+
+    }
+
+    return entry;
+  }
+
+  _onSubmitButtonClick(evt) {
+    evt.preventDefault();
+
+    const formData = new FormData(this._element.querySelector(`.card__form`));
+    const newData = this._processForm(formData);
+    if (typeof this._onSubmit === `function`) {
+      this._onSubmit(newData);
+    }
+
+    this.update(newData);
+  }
+
+  _onChangeDate() {
+    this._state.isDate = !this._state.isDate;
+    this.unbind();
+    this._partialUpdate();
+    this.bind();
+  }
+
+  _onChangeRepeated() {
+    this._state.isRepeated = !this._state.isRepeated;
+    this.unbind();
+    this._partialUpdate();
+    this.bind();
   }
 
   _isRepeated() {
@@ -23,6 +96,10 @@ export default class TaskEdit extends Component {
     return Date.now() < Date.parse(this._dueDate);
   }
 
+  _partialUpdate() {
+    this._element.innerHTML = this.template;
+  }
+
   set onSubmit(fn) {
     this._onSubmit = fn;
   }
@@ -31,7 +108,7 @@ export default class TaskEdit extends Component {
     return `
     <article class="card card--edit
       card--${this._color}
-      ${this._isRepeated() ? `card--repeat` : ``}
+      ${this._state.isRepeated && `card--repeat`}
       ${this._isDeadline() ? `` : `card--deadline`}"
     >
       <form class="card__form" method="get">
@@ -58,45 +135,45 @@ export default class TaskEdit extends Component {
             <div class="card__details">
               <div class="card__dates">
                 <button class="card__date-deadline-toggle" type="button">
-                  date: <span class="card__date-status">${this._dueDate ? `yes` : `no`}</span>
+                  date: <span class="card__date-status">${this._state.isDate ? `yes` : `no`}</span>
                 </button>
 
-                <fieldset class="card__date-deadline" ${this._dueDate ? `` : `disabled`}>
+                <fieldset class="card__date-deadline" ${!this._state.isDate && `disabled`}>
                   <label class="card__input-deadline-wrap">
-                    <input class="card__date" type="text" placeholder="${makeDate(this._dueDate)}" name="date" />
+                    <input class="card__date" type="text" placeholder="${moment(this._dueDate).format(`D MMMM`)}" name="date" />
                   </label>
 
                   <label class="card__input-deadline-wrap">
-                    <input class="card__time" type="text" placeholder="${makeTime(this._dueDate)}" name="time" />
+                    <input class="card__time" type="text" placeholder="${moment(this._dueDate).format(`h:mm a`)}" name="time" />
                   </label>
                 </fieldset>
 
                 <button class="card__repeat-toggle" type="button">
-                  repeat: <span class="card__repeat-status">${this._isRepeated() ? `yes` : `no`}</span>
+                  repeat: <span class="card__repeat-status">${this._state.isRepeated ? `yes` : `no`}</span>
                 </button>
 
-                <fieldset class="card__repeat-days" ${this._isRepeated() ? `` : `disabled`}>
+                <fieldset class="card__repeat-days" ${!this._state.isRepeated && `disabled`}>
                   <div class="card__repeat-days-inner">
-                    <input class="visually-hidden card__repeat-day-input" type="checkbox" id="repeat-mo-5" name="repeat" value="mo" ${this._repeatingDays.mo ? `checked` : ``} />
-                    <label class="card__repeat-day" for="repeat-mo-5">mo</label>
+                    <input class="visually-hidden card__repeat-day-input" type="checkbox" id="repeat-mo-${this._id}" name="repeat" value="mo" ${this._repeatingDays.mo && `checked`} />
+                    <label class="card__repeat-day" for="repeat-mo-${this._id}">mo</label>
 
-                    <input class="visually-hidden card__repeat-day-input" type="checkbox" id="repeat-tu-5" name="repeat" value="tu" ${this._repeatingDays.tu ? `checked` : ``} />
-                    <label class="card__repeat-day" for="repeat-tu-5">tu</label>
+                    <input class="visually-hidden card__repeat-day-input" type="checkbox" id="repeat-tu-${this._id}" name="repeat" value="tu" ${this._repeatingDays.tu && `checked`} />
+                    <label class="card__repeat-day" for="repeat-tu-${this._id}">tu</label>
 
-                    <input class="visually-hidden card__repeat-day-input" type="checkbox" id="repeat-we-5" name="repeat" value="we" ${this._repeatingDays.we ? `checked` : ``} />
-                    <label class="card__repeat-day" for="repeat-we-5" >w</label>
+                    <input class="visually-hidden card__repeat-day-input" type="checkbox" id="repeat-we-${this._id}" name="repeat" value="we" ${this._repeatingDays.we && `checked`} />
+                    <label class="card__repeat-day" for="repeat-we-${this._id}" >w</label>
 
-                    <input class="visually-hidden card__repeat-day-input" type="checkbox" id="repeat-th-5" name="repeat" value="th" ${this._repeatingDays.th ? `checked` : ``} />
-                    <label class="card__repeat-day" for="repeat-th-5">th</label>
+                    <input class="visually-hidden card__repeat-day-input" type="checkbox" id="repeat-th-${this._id}" name="repeat" value="th" ${this._repeatingDays.th && `checked`} />
+                    <label class="card__repeat-day" for="repeat-th-${this._id}">th</label>
 
-                    <input class="visually-hidden card__repeat-day-input" type="checkbox" id="repeat-fr-5" name="repeat" value="fr" ${this._repeatingDays.fr ? `checked` : ``} />
-                    <label class="card__repeat-day" for="repeat-fr-5" >fr</label>
+                    <input class="visually-hidden card__repeat-day-input" type="checkbox" id="repeat-fr-${this._id}" name="repeat" value="fr" ${this._repeatingDays.fr && `checked`} />
+                    <label class="card__repeat-day" for="repeat-fr-${this._id}" >fr</label>
 
-                    <input class="visually-hidden card__repeat-day-input" type="checkbox" id="repeat-sa-5" name="repeat" value="sa" ${this._repeatingDays.sa ? `checked` : ``} />
-                    <label class="card__repeat-day" for="repeat-sa-5">sa</label>
+                    <input class="visually-hidden card__repeat-day-input" type="checkbox" id="repeat-sa-${this._id}" name="repeat" value="sa" ${this._repeatingDays.sa && `checked`} />
+                    <label class="card__repeat-day" for="repeat-sa-${this._id}">sa</label>
 
-                    <input class="visually-hidden card__repeat-day-input" type="checkbox" id="repeat-su-5" name="repeat" value="su" ${this._repeatingDays.su ? `checked` : ``} />
-                    <label class="card__repeat-day" for="repeat-su-5" >su</label>
+                    <input class="visually-hidden card__repeat-day-input" type="checkbox" id="repeat-su-${this._id}" name="repeat" value="su" ${this._repeatingDays.su && `checked`} />
+                    <label class="card__repeat-day" for="repeat-su-${this._id}" >su</label>
                   </div>
                 </fieldset>
               </div>
@@ -129,20 +206,20 @@ export default class TaskEdit extends Component {
             <div class="card__colors-inner">
               <h3 class="card__colors-title">Color</h3>
               <div class="card__colors-wrap">
-                <input type="radio" id="color-black-5" class="card__color-input card__color-input--black visually-hidden" name="color" value="black" />
-                <label for="color-black-5" class="card__color card__color--black">black</label>
+                <input type="radio" id="color-black-${this._id}" class="card__color-input card__color-input--black visually-hidden" name="color" value="black" ${this._color === `black` && `checked`} />
+                <label for="color-black-${this._id}" class="card__color card__color--black">black</label>
 
-                <input type="radio" id="color-yellow-5" class="card__color-input card__color-input--yellow visually-hidden" name="color" value="yellow" />
-                <label for="color-yellow-5" class="card__color card__color--yellow">yellow</label>
+                <input type="radio" id="color-yellow-${this._id}" class="card__color-input card__color-input--yellow visually-hidden" name="color" value="yellow" ${this._color === `yellow` && `checked`} />
+                <label for="color-yellow-${this._id}" class="card__color card__color--yellow">yellow</label>
 
-                <input type="radio" id="color-blue-5" class="card__color-input card__color-input--blue visually-hidden" name="color" value="blue" />
-                <label for="color-blue-5" class="card__color card__color--blue">blue</label>
+                <input type="radio" id="color-blue-${this._id}" class="card__color-input card__color-input--blue visually-hidden" name="color" value="blue" ${this._color === `blue` && `checked`} />
+                <label for="color-blue-${this._id}" class="card__color card__color--blue">blue</label>
 
-                <input type="radio" id="color-green-5" class="card__color-input card__color-input--green visually-hidden" name="color" value="green" checked />
-                <label for="color-green-5" class="card__color card__color--green">green</label>
+                <input type="radio" id="color-green-${this._id}" class="card__color-input card__color-input--green visually-hidden" name="color" value="green" ${this._color === `green` && `checked`} />
+                <label for="color-green-${this._id}" class="card__color card__color--green">green</label>
 
-                <input type="radio" id="color-pink-5" class="card__color-input card__color-input--pink visually-hidden" name="color" value="pink" />
-                <label for="color-pink-5" class="card__color card__color--pink">pink</label>
+                <input type="radio" id="color-pink-${this._id}" class="card__color-input card__color-input--pink visually-hidden" name="color" value="pink" ${this._color === `pink` && `checked`} />
+                <label for="color-pink-${this._id}" class="card__color card__color--pink">pink</label>
               </div>
             </div>
           </div>
@@ -158,17 +235,57 @@ export default class TaskEdit extends Component {
   }
 
   bind() {
-    this._onSubmitButtonClick = (evt) => {
-      evt.preventDefault();
-      return typeof this._onSubmit === `function` && this._onSubmit();
-    };
-
     this._element.querySelector(`.card__form`)
         .addEventListener(`submit`, this._onSubmitButtonClick);
+    this._element.querySelector(`.card__date-deadline-toggle`)
+        .addEventListener(`click`, this._onChangeDate);
+    this._element.querySelector(`.card__repeat-toggle`)
+        .addEventListener(`click`, this._onChangeRepeated);
+
+    if (this._state.isDate) {
+      this._flatpickrDate = flatpickr(this._element.querySelector(`.card__date`), {altInput: true, altFormat: `j F`});
+      this._flatpickrTime = flatpickr(this._element.querySelector(`.card__time`), {enableTime: true, noCalendar: true, altInput: true, altFormat: `h:i K`, dateFormat: `h:i K`});
+    }
   }
 
   unbind() {
     this._element.querySelector(`.card__form`)
         .removeEventListener(`submit`, this._onSubmitButtonClick);
+    this._element.querySelector(`.card__date-deadline-toggle`)
+        .removeEventListener(`click`, this._onChangeDate);
+    this._element.querySelector(`.card__repeat-toggle`)
+        .removeEventListener(`click`, this._onChangeRepeated);
+    if (this._flatpickrDate) {
+      this._flatpickrDate.destroy();
+    }
+    if (this._flatpickrTime) {
+      this._flatpickrTime.destroy();
+    }
+  }
+
+  update(data) {
+    this._title = data.title;
+    this._tags = data.tags;
+    this._color = data.color;
+    this._repeatingDays = data.repeatingDays;
+    this._dueDate = data.dueDate;
+  }
+
+  static createMapper(target) {
+    return {
+      hashtag: (value) => target.tags.add(value),
+      text: (value) => {
+        target.title = value;
+      },
+      color: (value) => {
+        target.color = value;
+      },
+      repeat: (value) => {
+        target.repeatingDays[value] = true;
+      },
+      date: (value) => {
+        target.dueDate = new Date(value);
+      }
+    };
   }
 }

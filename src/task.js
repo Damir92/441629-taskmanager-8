@@ -1,5 +1,5 @@
 import Component from './component.js';
-import {makeDate, makeTime} from './utils.js';
+import moment from 'moment';
 
 export default class Task extends Component {
   constructor(data) {
@@ -11,6 +11,7 @@ export default class Task extends Component {
     this._repeatingDays = data.repeatingDays;
     this._color = data.color;
     this._isFavourite = data.isFavourite;
+    this._id = data.index;
 
     this._onEdit = null;
   }
@@ -58,11 +59,11 @@ export default class Task extends Component {
             <div class="card__dates">
               <fieldset class="card__date-deadline" ${this._dueDate ? `` : `disabled`}>
                 <label class="card__input-deadline-wrap">
-                  <input class="card__date" type="text" placeholder="${makeDate(this._dueDate)}" name="date" />
+                  <input class="card__date" type="text" placeholder="${moment(this._dueDate).format(`D MMMM`)}" name="date" />
                 </label>
 
                 <label class="card__input-deadline-wrap">
-                  <input class="card__time" type="text" placeholder="${makeTime(this._dueDate)}" name="time" />
+                  <input class="card__time" type="text" placeholder="${moment(this._dueDate).format(`h:mm a`)}" name="time" />
                 </label>
               </fieldset>
             </div>
@@ -111,5 +112,13 @@ export default class Task extends Component {
   unbind() {
     this._element.querySelector(`.card__btn--edit`)
         .removeEventListener(`click`, this._onEditButtonClick);
+  }
+
+  update(data) {
+    this._title = data.title;
+    this._tags = data.tags;
+    this._color = data.color;
+    this._repeatingDays = data.repeatingDays;
+    this._dueDate = data.dueDate;
   }
 }
