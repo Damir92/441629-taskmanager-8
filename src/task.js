@@ -13,7 +13,16 @@ export default class Task extends Component {
     this._isFavourite = data.isFavourite;
     this._id = data.index;
 
+    this._onEditButtonClick = this._onEditButtonClick.bind(this);
+
     this._onEdit = null;
+  }
+
+  _onEditButtonClick(evt) {
+    evt.preventDefault();
+    if (typeof this._onEdit === `function`) {
+      this._onEdit();
+    }
   }
 
   _isRepeated() {
@@ -101,10 +110,6 @@ export default class Task extends Component {
   }
 
   bind() {
-    this._onEditButtonClick = () => {
-      return typeof this._onEdit === `function` && this._onEdit();
-    };
-
     this._element.querySelector(`.card__btn--edit`)
         .addEventListener(`click`, this._onEditButtonClick);
   }

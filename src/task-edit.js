@@ -15,7 +15,10 @@ export default class TaskEdit extends Component {
     this._id = data.index;
 
     this._onSubmitButtonClick = this._onSubmitButtonClick.bind(this);
+    this._onDeleteButtonClick = this._onDeleteButtonClick.bind(this);
+
     this._onSubmit = null;
+    this._onDelete = null;
 
     this._state.isDate = this._dueDate;
     this._state.isRepeated = Object.values(this._repeatingDays).some((it) => it === true);
@@ -67,11 +70,20 @@ export default class TaskEdit extends Component {
 
     const formData = new FormData(this._element.querySelector(`.card__form`));
     const newData = this._processForm(formData);
+
     if (typeof this._onSubmit === `function`) {
       this._onSubmit(newData);
     }
 
     this.update(newData);
+  }
+
+  _onDeleteButtonClick(evt) {
+    evt.preventDefault();
+
+    if (typeof this._onDelete === `function`) {
+      this._onDelete();
+    }
   }
 
   _onChangeDate() {
@@ -102,6 +114,10 @@ export default class TaskEdit extends Component {
 
   set onSubmit(fn) {
     this._onSubmit = fn;
+  }
+
+  set onDelete(fn) {
+    this._onDelete = fn;
   }
 
   get template() {
@@ -237,6 +253,8 @@ export default class TaskEdit extends Component {
   bind() {
     this._element.querySelector(`.card__form`)
         .addEventListener(`submit`, this._onSubmitButtonClick);
+    this._element.querySelector(`.card__delete`)
+        .addEventListener(`click`, this._onDeleteButtonClick);
     this._element.querySelector(`.card__date-deadline-toggle`)
         .addEventListener(`click`, this._onChangeDate);
     this._element.querySelector(`.card__repeat-toggle`)
@@ -251,15 +269,20 @@ export default class TaskEdit extends Component {
   unbind() {
     this._element.querySelector(`.card__form`)
         .removeEventListener(`submit`, this._onSubmitButtonClick);
+    this._element.querySelector(`.card__delete`)
+        .removeEventListener(`click`, this._onDeleteButtonClick);
     this._element.querySelector(`.card__date-deadline-toggle`)
         .removeEventListener(`click`, this._onChangeDate);
     this._element.querySelector(`.card__repeat-toggle`)
         .removeEventListener(`click`, this._onChangeRepeated);
+
     if (this._flatpickrDate) {
       this._flatpickrDate.destroy();
+      this._flatpickrDate = null;
     }
     if (this._flatpickrTime) {
       this._flatpickrTime.destroy();
+      this._flatpickrTime = null;
     }
   }
 

@@ -1,7 +1,11 @@
-import getRandomTask from './data.js';
-import {mainFilter, filters} from './make-filter.js';
+import getRandomTask, {filters} from './data.js';
 import Task from './task.js';
 import TaskEdit from './task-edit';
+import Filter from './filter.js';
+import {createTagChart, createColorChart} from './stat.js';
+import moment from 'moment';
+
+const numOfTasks = 20;
 
 const boardTasks = document.querySelector(`.board__tasks`);
 
@@ -11,15 +15,43 @@ const removeTasks = () => {
   });
 };
 
-const makeBoard = (count) => {
-  removeTasks();
-  let arrayOfTasks = [];
+const makeFilter = (tasks, filtersArr) => {
+  const mainFilter = document.querySelector(`.main__filter`);
+  mainFilter.innerHTML = ``;
 
-  for (let i = 0; i < count; i++) {
-    arrayOfTasks[i] = getRandomTask(i);
+  for (let filter of filtersArr) {
+    const filterComponent = new Filter(filter);
+    mainFilter.appendChild(filterComponent.render());
+
+    filterComponent.onFilter = () => {
+      switch (filterComponent._name) {
+        case `all`:
+          return makeBoard(tasks);
+
+        case `overdue`:
+          return makeBoard(tasks.filter((it) => it.dueDate < Date.now()));
+
+        case `today`:
+          return makeBoard(tasks.filter((it) => moment(it.dueDate).format(`D MMMM`) === moment(Date.now()).format(`D MMMM`)));
+
+        case `repeating`:
+          return makeBoard(tasks.filter((it) => [...Object.entries(it.repeatingDays)]
+                      .some((rec) => rec[1])));
+
+        case `favourites`:
+          return makeBoard(tasks.filter((it) => it.isFavourite));
+
+        default:
+          return makeBoard(tasks);
+      }
+    };
   }
+};
 
-  for (let item of arrayOfTasks) {
+const makeBoard = (tasks) => {
+  removeTasks();
+
+  for (let item of tasks) {
     const taskComponent = new Task(item);
     const editTaskComponent = new TaskEdit(item);
 
@@ -43,13 +75,49 @@ const makeBoard = (count) => {
       boardTasks.replaceChild(taskComponent.element, editTaskComponent.element);
       editTaskComponent.unrender();
     };
+
+    editTaskComponent.onDelete = () => {
+      editTaskComponent.unrender();
+      arrayOfTasks.splice(arrayOfTasks.indexOf(item), 1);
+    };
   }
 };
 
-mainFilter.querySelectorAll(`.filter__input`).forEach((elem, index) => {
-  elem.addEventListener(`click`, function () {
-    makeBoard(filters[index]);
-  });
+const boardContainer = document.querySelector(`.board.container`);
+const statContainer = document.querySelector(`.statistic`);
+const statButton = document.querySelector(`#control__statistic`);
+
+const tagsCtx = document.querySelector(`.statistic__tags`);
+const colorsCtx = document.querySelector(`.statistic__colors`);
+
+// const activateStat = () => {
+//   boardContainer.classList.add(`visually-hidden`);
+//   statContainer.classList.remove(`visually-hidden`);
+//   createTagChart(tagsCtx);
+//   createColorChart(colorsCtx);
+//   console.log(tagsCtx);
+// }
+
+document.querySelector(`.control__btn-wrap`).addEventListener(`change`, () => {
+  if (statButton.checked) {
+    boardContainer.classList.add(`visually-hidden`);
+    statContainer.classList.remove(`visually-hidden`);
+    createTagChart(tagsCtx);
+    createColorChart(colorsCtx);
+  } else {
+    boardContainer.classList.remove(`visually-hidden`);
+    statContainer.classList.add(`visually-hidden`);
+    // createTagChart(tagsCtx);
+    // createColorChart(colorsCtx);
+  }
 });
 
-makeBoard(filters[0]);
+let arrayOfTasks = [];
+
+for (let i = 0; i < numOfTasks; i++) {
+  arrayOfTasks[i] = getRandomTask(i);
+}
+
+makeFilter(arrayOfTasks, filters);
+
+makeBoard(arrayOfTasks);

@@ -9,10 +9,9 @@ const makeFilter = (name, count, isChecked = false) => `<input
           class="filter__input visually-hidden"
           name="filter"
           ${ isChecked ? `checked` : `` }
-          ${ count === 0 ? `disabled` : ``}
         />
         <label for="filter__${name}" class="filter__label">
-          ${name.toUpperCase()} <span class="filter__${name}-count">${count}</span></label
+          ${name.toUpperCase()} <span class="filter__${name}-count"></span></label
         >`;
 
 const makeFilterCount = (count) => {

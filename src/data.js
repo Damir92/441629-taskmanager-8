@@ -10,6 +10,15 @@ const days = {
   sa: false,
   su: false
 };
+export const filters = [
+  {name: `all`, checked: true},
+  {name: `overdue`, checked: false},
+  {name: `today`, checked: false},
+  {name: `favorites`, checked: false},
+  {name: `repeating`, checked: false},
+  {name: `tags`, checked: false},
+  {name: `archive`, checked: false}
+];
 
 const getRandom = (length) => Math.floor(Math.random() * length);
 
