@@ -3,7 +3,7 @@ import Task from './task.js';
 import TaskEdit from './task-edit';
 import Filter from './filter.js';
 import {createTagChart, createColorChart} from './stat.js';
-import moment from 'moment';
+import {filterTask} from './utils.js';
 
 const numOfTasks = 20;
 
@@ -15,6 +15,10 @@ const removeTasks = () => {
   });
 };
 
+const getFilterName = () => {
+  return document.querySelector(`.main__filter input:checked`).id.replace(`filter__`, ``);
+};
+
 const makeFilter = (tasks, filtersArr) => {
   const mainFilter = document.querySelector(`.main__filter`);
   mainFilter.innerHTML = ``;
@@ -24,26 +28,16 @@ const makeFilter = (tasks, filtersArr) => {
     mainFilter.appendChild(filterComponent.render());
 
     filterComponent.onFilter = () => {
-      switch (filterComponent._name) {
-        case `all`:
-          return makeBoard(tasks);
 
-        case `overdue`:
-          return makeBoard(tasks.filter((it) => it.dueDate < Date.now()));
+      let filteredtasks = [];
 
-        case `today`:
-          return makeBoard(tasks.filter((it) => moment(it.dueDate).format(`D MMMM`) === moment(Date.now()).format(`D MMMM`)));
-
-        case `repeating`:
-          return makeBoard(tasks.filter((it) => [...Object.entries(it.repeatingDays)]
-                      .some((rec) => rec[1])));
-
-        case `favourites`:
-          return makeBoard(tasks.filter((it) => it.isFavourite));
-
-        default:
-          return makeBoard(tasks);
+      for (let item of tasks) {
+        if (filterTask(item, filterComponent._name)) {
+          filteredtasks.push(item);
+        }
       }
+
+      return makeBoard(filteredtasks);
     };
   }
 };
@@ -71,8 +65,10 @@ const makeBoard = (tasks) => {
       item.dueDate = newObject.dueDate;
 
       taskComponent.update(item);
-      taskComponent.render();
-      boardTasks.replaceChild(taskComponent.element, editTaskComponent.element);
+      if (filterTask(item, getFilterName())) {
+        taskComponent.render();
+        boardTasks.replaceChild(taskComponent.element, editTaskComponent.element);
+      }
       editTaskComponent.unrender();
     };
 
