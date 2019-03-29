@@ -1,13 +1,13 @@
 import Chart from 'chart.js';
 
-export function createTagChart(tagsCtx) {
+export function createTagChart(tagsCtx, tasks) {
   return new Chart(tagsCtx, {
     type: `pie`,
     data: {
-      labels: [`#watchstreams`, `#relaxation`, `#coding`, `#sleep`, `#watermelonpies`],
+      labels: tasks[3],
       datasets: [{
-        data: [20, 15, 10, 5, 2],
-        backgroundColor: [`#ff3cb9`, `#ffe125`, `#0c5cdd`, `#000000`, `#31b55c`]
+        data: tasks[4],
+        backgroundColor: tasks[1]
       }]
     },
     options: {
@@ -55,14 +55,14 @@ export function createTagChart(tagsCtx) {
   });
 }
 
-export function createColorChart(colorsCtx) {
+export function createColorChart(colorsCtx, tasks) {
   return new Chart(colorsCtx, {
     type: `pie`,
     data: {
-      labels: [`#pink`, `#yellow`, `#blue`, `#black`, `#green`],
+      labels: tasks[0],
       datasets: [{
-        data: [5, 25, 15, 10, 30],
-        backgroundColor: [`#ff3cb9`, `#ffe125`, `#0c5cdd`, `#000000`, `#31b55c`]
+        data: tasks[2],
+        backgroundColor: tasks[1]
       }]
     },
     options: {
