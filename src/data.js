@@ -1,6 +1,7 @@
 const titles = [`Изучить теорию`, `Сделать домашку`, `Пройти интенсив на соточку`];
-const tags = new Set([`homework`, `theory`, `practice`, `intensive`, `keks`]);
-const colors = [`black`, `yellow`, `blue`, `green`, `pink`];
+export const tags = [`homework`, `theory`, `practice`, `intensive`, `keks`];
+export const colors = [`pink`, `yellow`, `blue`, `black`, `green`];
+export const colorsCode = [`#ff3cb9`, `#ffe125`, `#0c5cdd`, `#000000`, `#31b55c`];
 const days = {
   mo: false,
   tu: false,
@@ -10,6 +11,15 @@ const days = {
   sa: false,
   su: false
 };
+export const filters = [
+  {name: `all`, checked: true},
+  {name: `overdue`, checked: false},
+  {name: `today`, checked: false},
+  {name: `favorites`, checked: false},
+  {name: `repeating`, checked: false},
+  {name: `tags`, checked: false},
+  {name: `archive`, checked: false}
+];
 
 const getRandom = (length) => Math.floor(Math.random() * length);
 
@@ -21,7 +31,7 @@ const getTags = (tag) => {
   let setOfTags = new Set();
 
   for (let index = 0; index < 3; index++) {
-    setOfTags.add([...tag][getRandom(tag.size)]);
+    setOfTags.add(tag[getRandom(tag.length)]);
   }
 
   return setOfTags;
