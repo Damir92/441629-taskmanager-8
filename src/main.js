@@ -115,16 +115,17 @@ const createDataForStat = (tasks) => {
   return result;
 };
 
-const createStat = (rangeDate = false) => {
+const createStat = () => {
   let newTasksArray = [];
-  let dateStart = moment().startOf(`week`).format(`YYYY-MMMM-DD`);
-  let dateEnd = moment().endOf(`week`).format(`YYYY-MMMM-DD`);
-  if (rangeDate) {
-    dateStart = rangeDate[0];
-    dateEnd = rangeDate[1];
+  let dateStart = moment().startOf(`week`).format(`YYYY-MM-DD`);
+  let dateEnd = moment().endOf(`week`).format(`YYYY-MM-DD`);
+  let rengeDate = statInput.value.split(` to `);
+  if (rengeDate.length === 2) {
+    dateStart = rengeDate[0];
+    dateEnd = rengeDate[1];
   }
   for (let item of arrayOfTasks) {
-    if (moment(item.dueDate).format(`YYYY-MMMM-DD`) >= dateStart && moment(item.dueDate).format(`YYYY-MMMM-DD`) <= dateEnd) {
+    if (moment(item.dueDate).format(`YYYY-MM-DD`) >= dateStart && moment(item.dueDate).format(`YYYY-MM-DD`) <= dateEnd) {
       newTasksArray.push(item);
     }
   }
@@ -163,9 +164,8 @@ flatpickr(statInput, {
 });
 
 statInput.addEventListener(`change`, () => {
-  const rangeDate = statInput.value.split(` to `);
-  if (rangeDate.length === 2) {
-    createStat(rangeDate);
+  if (statInput.value.split(` to `).length === 2) {
+    createStat();
   }
 });
 

@@ -1,7 +1,12 @@
 import Chart from 'chart.js';
+let tagChart = ``;
+let colorChart = ``;
 
 export function createTagChart(tagsCtx, tasks) {
-  return new Chart(tagsCtx, {
+  if (tagChart) {
+    tagChart.destroy();
+  }
+  tagChart = new Chart(tagsCtx, {
     type: `pie`,
     data: {
       labels: tasks[3],
@@ -53,10 +58,14 @@ export function createTagChart(tagsCtx, tasks) {
       }
     }
   });
+  return tagChart;
 }
 
 export function createColorChart(colorsCtx, tasks) {
-  return new Chart(colorsCtx, {
+  if (colorChart) {
+    colorChart.destroy();
+  }
+  colorChart = new Chart(colorsCtx, {
     type: `pie`,
     data: {
       labels: tasks[0],
@@ -108,4 +117,5 @@ export function createColorChart(colorsCtx, tasks) {
       }
     }
   });
+  return colorChart;
 }
